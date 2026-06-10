@@ -22,7 +22,6 @@ GROMACS-HPC-Protein-MD/
 ├── npt.mdp
 ├── md.mdp
 ├── charmm36-jul2022.ff/
-├── docs/
 └── .gitignore
 ```
 
