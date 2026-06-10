@@ -22,6 +22,7 @@ GROMACS-HPC-Protein-MD/
 ├── npt.mdp
 ├── md.mdp
 ├── charmm36-jul2022.ff/
+├── docs/
 └── .gitignore
 ```
 
@@ -39,6 +40,47 @@ npt.mdp
 md.mdp
 charmm36-jul2022.ff/
 ```
+
+### Update `md.mdp` for the simulation length you want
+
+Before submitting `job.sh`, edit the production MD file:
+
+```text
+md.mdp
+```
+
+The total production simulation length is controlled by `nsteps` and `dt`:
+
+```text
+integrator              = md         ; leap-frog integrator
+nsteps                  = 100000000  ; number of MD steps
+dt                      = 0.002      ; time step in ps, here 0.002 ps = 2 fs
+```
+
+The total simulation time is:
+
+```text
+total simulation time = nsteps × dt
+```
+
+Example for 200 ns:
+
+```text
+100000000 × 0.002 ps = 200000 ps = 200 ns
+```
+
+Common examples when `dt = 0.002 ps`:
+
+```text
+nsteps = 50000000     ; 100 ns
+nsteps = 100000000    ; 200 ns
+nsteps = 250000000    ; 500 ns
+nsteps = 500000000    ; 1000 ns = 1 us
+```
+
+Important: edit `md.mdp` before the first production `.tpr` file is generated. Once `protein_md.tpr` already exists, changing `md.mdp` alone will not change the running simulation length. To extend an already completed simulation, use `gmx_mpi convert-tpr` as described below.
+
+### Download CHARMM36 force field folder
 
 Download the CHARMM36 force field folder from the MacKerell Lab CHARMM force field page:
 
@@ -61,6 +103,7 @@ Then confirm that this folder exists:
 ```bash
 ls charmm36-jul2022.ff/
 ```
+
 
 ## Edit before running
 
