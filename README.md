@@ -1,6 +1,6 @@
 # GROMACS Protein MD on HPC using SLURM
 
-Beginner-friendly template for running a protein molecular dynamics simulation using GROMACS on an HPC cluster with SLURM.
+This repository contains a reproducible GROMACS molecular dynamics workflow for running protein simulations on an HPC cluster using SLURM. The workflow includes system preparation, solvation, ion addition, energy minimization, NVT equilibration, NPT equilibration, and restartable/chunked production MD.
 
 This workflow is adapted from:
 
@@ -38,6 +38,28 @@ nvt.mdp
 npt.mdp
 md.mdp
 charmm36-jul2022.ff/
+```
+
+Download the CHARMM36 force field folder from the MacKerell Lab CHARMM force field page:
+
+[Download CHARMM36 force field files for GROMACS](http://mackerell.umaryland.edu/charmm_ff.shtml#gromacs)
+
+For this template, the expected folder name is:
+
+```text
+charmm36-jul2022.ff/
+```
+
+After downloading the `.tgz` file, extract it in the same directory as `job.sh`. Example:
+
+```bash
+tar -zxvf charmm36-jul2022.ff.tgz
+```
+
+Then confirm that this folder exists:
+
+```bash
+ls charmm36-jul2022.ff/
 ```
 
 ## Edit before running
