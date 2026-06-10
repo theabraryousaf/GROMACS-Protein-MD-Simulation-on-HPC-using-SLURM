@@ -1,6 +1,6 @@
 # GROMACS Protein MD on HPC using SLURM
 
-This repository contains a reproducible GROMACS molecular dynamics workflow for running protein simulations on an HPC cluster using SLURM. The workflow includes system preparation, solvation, ion addition, energy minimization, NVT equilibration, NPT equilibration, and restartable/chunked production MD.
+This repository contains a beginner-friendly GROMACS molecular dynamics workflow for running protein simulations on an HPC cluster using SLURM. The workflow includes system preparation, solvation, ion addition, energy minimization, NVT equilibration, NPT equilibration, and restartable/chunked production MD.
 
 This workflow is adapted from:
 
@@ -103,7 +103,6 @@ Then confirm that this folder exists:
 ls charmm36-jul2022.ff/
 ```
 
-
 ## Edit before running
 
 In `job.sh`, replace:
@@ -112,10 +111,15 @@ In `job.sh`, replace:
 #SBATCH --account=YOUR_PROJECT_ACCOUNT
 #SBATCH --partition=YOUR_HPC_PARTITION
 module load YOUR_GROMACS_MODULE
-module help YOUR_GROMACS_MODULE
 ```
 
 with the correct values for your HPC.
+
+If your HPC requires an extra profile module, uncomment and edit this line in `job.sh`:
+
+```bash
+# module load profile/lifesc
+```
 
 The script uses the local CHARMM36 force field folder:
 
@@ -129,11 +133,93 @@ and calls it using:
 -ff charmm36-jul2022
 ```
 
+## Upload files to HPC
+
+After preparing the repository folder on your local computer, upload the complete folder to your HPC system.
+
+### Option 1: upload with `rsync`
+
+Run this command from your local computer terminal, not from inside the HPC:
+
+```bash
+rsync -avP GROMACS-HPC-Protein-MD/ USERNAME@HPC_HOST:/path/to/your/project/GROMACS-HPC-Protein-MD/
+```
+
+Replace:
+
+```text
+USERNAME                 your HPC username
+HPC_HOST                 your HPC login or data-transfer host
+/path/to/your/project/   your working/project directory on the HPC
+```
+
+Example format:
+
+```bash
+rsync -avP GROMACS-HPC-Protein-MD/ USERNAME@data.your-hpc.edu:/path/to/your/project/GROMACS-HPC-Protein-MD/
+```
+
+### Option 2: upload with `scp`
+
+```bash
+scp -r GROMACS-HPC-Protein-MD USERNAME@HPC_HOST:/path/to/your/project/
+```
+
+### Check uploaded files on HPC
+
+Login to the HPC:
+
+```bash
+ssh USERNAME@HPC_LOGIN_NODE
+```
+
+Go to your simulation folder:
+
+```bash
+cd /path/to/your/project/GROMACS-HPC-Protein-MD
+```
+
+Check that all required files are present:
+
+```bash
+ls
+```
+
+You should see:
+
+```text
+job.sh
+protein.pdb
+ions.mdp
+minim.mdp
+nvt.mdp
+npt.mdp
+md.mdp
+charmm36-jul2022.ff/
+```
+
 ## Submit the job
+
+From inside the simulation folder on the HPC, submit the SLURM job:
 
 ```bash
 sbatch job.sh
 ```
+
+Check that the job was submitted:
+
+```bash
+squeue -u $USER
+```
+
+Check the SLURM output and error files:
+
+```bash
+tail -50 gmx.<JOBID>.out
+tail -50 gmx.<JOBID>.err
+```
+
+Replace `<JOBID>` with your actual SLURM job ID.
 
 ## Continue the simulation after a walltime chunk
 
@@ -203,8 +289,12 @@ protein_md.edr
 protein_md.log
 ```
 
-## Notes
+## Notes for beginners
 
 Energy minimization is run without GPU PME. GPU PME is used for NVT, NPT, and production MD.
 
-Users should inspect all `grompp` warnings and validate equilibration before using production results.
+This template is for a standard protein-only system. Systems with ligands, cofactors, membranes, metal ions, modified residues, or nonstandard residues require extra topology/parameter files and additional checks.
+
+The box distance, ion settings, force field, water model, and MDP parameters should be checked for each system. The default `-d 1.2` cubic box is a reasonable starting point for many globular proteins but may not be suitable for every protein.
+
+This public template does not use `-maxwarn` by default. Users should inspect all `grompp` warnings and validate equilibration before using production results. GROMACS warnings should not be ignored unless the user understands the cause and knows it is safe.
