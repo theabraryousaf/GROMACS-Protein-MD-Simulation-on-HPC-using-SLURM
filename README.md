@@ -22,9 +22,6 @@ GROMACS-HPC-Protein-MD/
 ├── npt.mdp
 ├── md.mdp
 ├── charmm36-jul2022.ff/
-├── docs/
-│   ├── leonardo_file_transfer_example.txt
-│   └── leonardo_login_example.txt
 └── .gitignore
 ```
 
